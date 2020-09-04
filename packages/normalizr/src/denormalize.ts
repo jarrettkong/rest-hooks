@@ -1,7 +1,12 @@
 import { isImmutable } from './schemas/ImmutableUtils';
 import { denormalize as arrayDenormalize } from './schemas/Array';
 import { denormalize as objectDenormalize } from './schemas/Object';
-import { Denormalize, DenormalizeNullable, Schema } from './types';
+import {
+  Denormalize,
+  DenormalizeNullable,
+  Schema,
+  DenormalizeCache,
+} from './types';
 import Entity, { isEntity } from './entities/Entity';
 import FlatEntity from './entities/FlatEntity';
 import { DELETED } from './special';
@@ -11,7 +16,7 @@ const unvisitEntity = (
   schema: any,
   unvisit: any,
   getEntity: any,
-  cache: Record<string, any>,
+  cache: Record<string, Record<string, any>>,
 ): [any, boolean, boolean] => {
   const entity = getEntity(id, schema);
   if (entity === DELETED) {
@@ -112,6 +117,7 @@ export const denormalize = <S extends Schema>(
   input: any,
   schema: S,
   entities: any,
+  cache?: DenormalizeCache,
 ):
   | [Denormalize<S>, true, false, Record<string, Record<string, any>>]
   | [
